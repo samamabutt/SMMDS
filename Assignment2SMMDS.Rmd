@@ -1,0 +1,170 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+plot(cars)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+
+
+
+
+
+
+
+```{r}
+
+#Loading Training Set File
+datAll = read.table("E:/MS DS/Stats Methods & Tech DS/assignment 2/trainData.txt", quote="\"", comment.char="")
+View(datAll)
+```
+
+
+
+
+```{r}
+#Counting total number of rows in the training set
+total_rows = nrow(datAll)
+total_rows
+```
+
+
+
+```{r}
+#Extracting Labels from the Training Set
+labels = datAll[,ncol(datAll)]
+labels
+```
+```{r}
+#Counting total number of zero's and one's in the labels column of the training set
+a <- table(labels)
+
+total_zero_labels = a[names(a)==0]
+
+total_one_labels = a[names(a)==1]
+
+total_zero_labels
+
+total_one_labels
+```
+
+
+
+```{r}
+#Finding Probability of one's in the lables of the Training Set
+prob_of_label_one = total_one_labels/total_rows
+prob_of_label_one
+```
+
+```{r}
+#Finding Probability of zero's in the lables of the Training Set
+prob_of_label_zero = total_zero_labels/total_rows
+prob_of_label_zero
+```
+
+```{r}
+#Dividing the Training Set based on the Lable one
+one_class = labels == 1
+one_class
+label_one_Dat = datAll[one_class,]
+label_one_Dat
+```
+```{r}
+#Findind Probability of one class one
+prob_Of1_Class1 = colMeans(label_one_Dat)	
+prob_Of1_Class1
+
+```
+```{r}
+#Dividing the Training Set based on the Lable zero
+zero_class = labels == 0
+zero_class
+label_zero_Dat = datAll[zero_class,]
+label_zero_Dat
+```
+```{r}
+#Findind Probability of one class zero
+prob_Of1_Class0 = colMeans(label_zero_Dat)	
+prob_Of1_Class0
+```
+```{r}
+#Findind Probability of zero class zero
+prob_of0_class0 = 1 - prob_Of1_Class0
+prob_of0_class0
+```
+```{r}
+#Findind Probability of zero class one
+prob_of0_class1 = 1 - prob_Of1_Class1
+prob_of0_class1
+```
+
+```{r}
+#Loading Testing Set files
+testAll = read.table("E:/MS DS/Stats Methods & Tech DS/assignment 2/testData.txt", quote="\"", comment.char="")
+View(testAll)
+```
+
+
+
+
+
+
+```{r}
+#Naive Bayes Algorithm
+
+
+for(i in 1:nrow(testAll)){
+  l <- c()
+  m <- c()
+  count = 0
+  for(j in testAll){
+    count = count + 1
+    if(j[i]==1){
+        m[count] = prob_Of1_Class0[count]
+        l[count] = prob_Of1_Class1[count]
+      }else{
+        m[count] = prob_of0_class0[count]
+        l[count] = prob_of0_class1[count]
+      }
+  }
+MLE0 = prod(m)
+MLE1 = prod(l)
+num0=MLE0*prob_of_label_zero
+num1=MLE1*prob_of_label_one
+denominator = num0+num1
+
+
+MAP0=num0/denominator
+MAP1=num1/denominator
+
+cat("ROW no",i,"\n","MLE = P(x|C=0) = ",MLE0,"\n","MLE = P(x|C=1) = ",MLE1,"\n")
+if(MLE0<MLE1){
+  cat("Predicted class based on MLE = 1","\n")
+}else{
+  cat("Predicted class based on MLE = 0","\n")
+}
+cat("MAP = P(C=0|x) = ",MAP0,"\n","MAP = P(C=1|x) =",MAP1,"\n")
+if(MAP0<MAP1){
+  cat("Predicted class based on MAP = 1","\n","\n")
+}else{
+  cat("Predicted class based on MAP = 0","\n","\n")
+} 
+
+}
+ 
+   
+ 
+```
+
